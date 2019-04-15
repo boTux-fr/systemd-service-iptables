@@ -1,0 +1,24 @@
+[Unit]
+Description=Network Netfilter Iptables Rules loading for %I rules
+Before=network-pre.target
+Wants=network-pre.target
+ConditionPathExists=/etc/iptables/
+
+[Service]
+
+Environment="IPTABLES_RULES=/etc/iptables/%i.rules"
+
+Type=oneshot
+# Start iptables-restore with no-flush option with %i.rules
+# NoFlush option (-n) is used to not flush other tables than %I.
+ExecStart=/sbin/iptables-restore -n ${IPTABLES_RULES}
+# Reload the rules
+ExecReload=/sbin/iptables-restore -n ${IPTABLES_RULES}
+# Stop and clean with empty rules
+ExecStop=/sbin/iptables-restore -n ${IPTABLES_RULES}.empty
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+# Need /etc/iptables/base.rules to exist.
+DefaultInstance=base

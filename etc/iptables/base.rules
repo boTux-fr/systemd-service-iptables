@@ -1,0 +1,56 @@
+*filter
+
+# WAN = ens192 ; LAN = ens160
+
+# Reset counters
+:INPUT ACCEPT [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:FILTERS - [0:0]
+:FILTERS-LAN - [0:0]
+
+# Flush
+-F INPUT
+-F FILTERS
+-F FILTERS-LAN
+
+# Select
+-A INPUT -i lo -j ACCEPT
+-A INPUT -i ens160 -j FILTERS-LAN
+-A INPUT -i ens192 -j FILTERS
+
+# Filters
+## Activate established connexions
+-A FILTERS -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+## Monitoring
+-A FILTERS -s 10.1.1.1/32 -p udp -m udp --dport 161 -j ACCEPT
+-A FILTERS -s 10.1.1.1/32 -p tcp -m tcp --dport 5666 -j ACCEPT
+-A FILTERS -s 10.1.1.1/32 -p icmp --icmp-type any -j ACCEPT
+
+## Admin ssh
+-A FILTERS -s 10.0.0.1/32 -p tcp -m tcp --dport 22 -j ACCEPT
+-A FILTERS -s 10.0.1.1/32 -p tcp -m tcp --dport 22 -j ACCEPT
+
+## Admin ping
+-A FILTERS -s 10.0.0.1/32 -p icmp --icmp-type any -j ACCEPT
+-A FILTERS -s 10.0.1.1/32 -p icmp --icmp-type any -j ACCEPT
+
+## Drop public in
+-A FILTERS -j DROP
+
+# Filters-LAN
+## Activate established connexions
+-A FILTERS-LAN -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+## Admin allow all
+-A FILTERS-LAN -s 10.0.1.1/32 -j ACCEPT
+
+## Ping
+-A FILTERS-LAN -s 10.0.1.1/24 -p icmp --icmp-type any -j ACCEPT
+
+## Log and Drop lan in
+-A FILTERS-LAN -j LOG --log-prefix "[LAN BLOCK] "
+-A FILTERS-LAN -j DROP
+
+COMMIT

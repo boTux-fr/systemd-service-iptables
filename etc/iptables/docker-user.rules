@@ -1,0 +1,27 @@
+*filter
+
+# WAN = ens192 ; LAN = ens160
+
+# Reset counters
+:DOCKER-USER - [0:0]
+
+# Flush
+-F DOCKER-USER
+
+# Filters :
+## Activate established connexions
+-A DOCKER-USER -i ens192 -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN
+
+## Allow all on https/http
+-A DOCKER-USER -i ens192 -p tcp -m tcp -m conntrack --ctorigdstport 80 -j RETURN
+-A DOCKER-USER -i ens192 -p tcp -m tcp -m conntrack --ctorigdstport 443 -j RETURN
+
+## Allow 8080 from ip
+-A DOCKER-USER -i ens192 -p tcp -m tcp -m conntrack --ctorigdstport 8080 -s 10.11.11.0/24 -j RETURN
+-A DOCKER-USER -i ens192 -p tcp -m tcp -m conntrack --ctorigdstport 8080 -s 10.22.22.0/24 -j RETURN
+
+# Block all external
+-A DOCKER-USER -i ens192 -j DROP
+-A DOCKER-USER -j RETURN
+
+COMMIT

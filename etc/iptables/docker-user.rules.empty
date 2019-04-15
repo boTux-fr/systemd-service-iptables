@@ -1,0 +1,9 @@
+*filter
+
+# Reset counters
+:DOCKER-USER - [0:0]
+
+# Flush
+-F DOCKER-USER
+
+COMMIT
