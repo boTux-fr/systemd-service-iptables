@@ -25,7 +25,11 @@ systemctl daemon-reload
 systemctl enable iptables@base
 systemctl start iptables@base
 # To start another rules config files : 
-systemctk start iptables@docker-user
+systemctl enable iptables@docker-user
+systemctl start iptables@docker-user
+# Check status :
+systemctl status iptables@base iptables@docker-user
+
 ```
 
 ## Configuration
@@ -34,10 +38,10 @@ Add - Edit - Remove rulebook from `/etc/iptables/` to allow a new sub-service to
 
 Template included in the repository : 
 
-  - base.rules
-  - base.rules.empty
-  - docker-user.rules
-  - docker-user.rules.empty
+  - [base.rules](etc/iptables/base.rules.empty)
+  - [base.rules.empty](etc/iptables/base.rules)
+  - [docker-user.rules](etc/iptables/docker-user.rules)
+  - [docker-user.rules.empty](etc/iptables/docker-user.rules.empty)
 
 ### base.rules
 
