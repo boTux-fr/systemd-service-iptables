@@ -1,7 +1,10 @@
 [Unit]
 Description=Network Netfilter Iptables Rules loading for %I rules
-Before=network-pre.target
-Wants=network-pre.target
+DefaultDependencies=no
+Wants=network-pre.target systemd-modules-load.service local-fs.target
+Before=network-pre.target shutdown.target
+After=systemd-modules-load.service local-fs.target
+Conflicts=shutdown.target
 ConditionPathExists=/etc/iptables/
 
 [Service]
