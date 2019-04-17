@@ -1,24 +1,29 @@
 [Unit]
-Description=Network Netfilter Iptables Rules loading for %I rules
 DefaultDependencies=no
-Wants=network-pre.target systemd-modules-load.service local-fs.target
-Before=network-pre.target shutdown.target
-After=systemd-modules-load.service local-fs.target
+Wants=network-pre.target
+Wants=systemd-modules-load.service
+Wants=local-fs.target
+Before=network-pre.target
+Before=shutdown.target
+After=systemd-modules-load.service
+After=local-fs.target
+After=dbus.service
+After=polkit.service
 Conflicts=shutdown.target
 ConditionPathExists=/etc/iptables/
 
 [Service]
-
-Environment="IPTABLES_RULES=/etc/iptables/%i.rules"
+Environment=IPTABLES_RULES=/etc/iptables/%i.rules
+Environment=IPTABLES_RULES_FLUSH=/etc/iptables/%i.rules.empty
 
 Type=oneshot
 # Start iptables-restore with no-flush option with %i.rules
 # NoFlush option (-n) is used to not flush other tables than %I.
-ExecStart=/sbin/iptables-restore -n ${IPTABLES_RULES}
+ExecStart=/sbin/iptables-restore -v -n $IPTABLES_RULES
 # Reload the rules
-ExecReload=/sbin/iptables-restore -n ${IPTABLES_RULES}
+ExecReload=/sbin/iptables-restore -v -n $IPTABLES_RULES 
 # Stop and clean with empty rules
-ExecStop=/sbin/iptables-restore -n ${IPTABLES_RULES}.empty
+ExecStop=/sbin/iptables-restore -v -n $IPTABLES_RULES_FLUSH
 RemainAfterExit=yes
 
 [Install]
