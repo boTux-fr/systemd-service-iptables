@@ -22,13 +22,14 @@ cd systemd-service-iptables/
 # and install the service
 cp -Rv etc/. /etc/
 systemctl daemon-reload
-systemctl enable iptables@base
-systemctl start iptables@base
+systemctl enable iptables.service
+systemctl enable iptables@base.service
+systemctl start iptables@base.sercice
 # To start another rules config files : 
-systemctl enable iptables@docker-user
-systemctl start iptables@docker-user
+systemctl enable iptables@docker-user.service
+systemctl start iptables@docker-user.service
 # Check status :
-systemctl status iptables@base iptables@docker-user
+systemctl status iptables@base.service iptables@docker-user.service
 
 ```
 
@@ -59,7 +60,34 @@ _Open https port :_
 
     -A FILTERS -p tcp -m tcp --dport 443 -j ACCEPT
 
-### docker-user.rules
+### Other rules
+
+When we want to add another set of rules, we need to manually add an override on the new rule to set `Wants=iptables@base.service` as dependencie, then the new rules will be loaded after the base.
+
+When we add another one, we need to map it to the second.
+
+Exemple with docker-user.rules
+
+#### docker-user.rules
+
+Enable, start and configure the service :
+
+```bash
+systemctl enable iptables@docker-user.service
+systemctl start iptables@docker-user.service
+systemctl edit iptables@docker-user.service
+```
+
+Add to the override :
+
+```conf
+[Unit]
+Wants=iptables@base.service
+```
+
+And save. You can now reboot safely without risking `COMMIT` error with `iptables-restore`.
+
+------------------------------
 
 Requirements : docker
 

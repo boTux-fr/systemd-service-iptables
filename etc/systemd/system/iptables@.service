@@ -9,8 +9,10 @@ After=systemd-modules-load.service
 After=local-fs.target
 After=dbus.service
 After=polkit.service
+PartOf=iptables.service
 Conflicts=shutdown.target
 ConditionPathExists=/etc/iptables/
+Documentation=man:iptables man:iptables-restore
 
 [Service]
 Environment=IPTABLES_RULES=/etc/iptables/%i.rules
