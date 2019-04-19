@@ -1,0 +1,10 @@
+[Unit]
+Documentation=man:iptables man:iptables-restore
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+RemainAfterExit=on
+
+[Install]
+WantedBy=multi-user.target
