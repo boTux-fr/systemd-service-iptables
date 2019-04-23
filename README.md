@@ -62,7 +62,7 @@ _Open https port :_
 
 ### Other rules
 
-When we want to add another set of rules, we need to manually add an override on the new rule to set `Wants=iptables@base.service` as dependencie, then the new rules will be loaded after the base.
+When we want to add another set of rules, we need to manually add an override on the new rule to set `After=iptables@base.service` as dependencie, then the new rules will be loaded after the base.
 
 When we add another one, we need to map it to the second.
 
@@ -82,7 +82,7 @@ Add to the override :
 
 ```conf
 [Unit]
-Wants=iptables@base.service
+After=iptables@base.service
 ```
 
 And save. You can now reboot safely without risking `COMMIT` error with `iptables-restore`.
